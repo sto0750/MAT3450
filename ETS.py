@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
-class ETS :
+class ETS_model :
     def __init__(self, data):
         self.data = data
         self.monthly_mean = None
@@ -55,21 +55,42 @@ class ETS :
 
         plt.show()
 
+        # 여기까지는 보고서용, 아래부터는 실제 프로그램용
+
+    def actual_predict(self, term, trend = "add", seasonal = "add"): # term : 몇 개월 뒤까지 예측하고 싶은 지
+        actual_model = ExponentialSmoothing(self.monthly_mean[['미세먼지(PM10)']], trend=trend, seasonal=seasonal, seasonal_periods=12)
+        actual_fit = actual_model.fit()
+        actual_forecast = actual_fit.forecast(term)
+        # for i in range(term):
+        #     print(actual_forecast.index[i].year,"년",
+        #           actual_forecast.index[i].month,"월",
+        #           "\t", round(actual_forecast.iloc[i], 1))
+
+        actual_model_25 = ExponentialSmoothing(self.monthly_mean[['초미세먼지(PM2.5)']], trend=trend, seasonal=seasonal, seasonal_periods=12)
+        actual_fit_25 = actual_model_25.fit()
+        actual_forecast_25 = actual_fit_25.forecast(term)
+        for i in range(term):
+            print(actual_forecast_25.index[i].year,"년",
+                  actual_forecast_25.index[i].month,"월",
+                  "\t\t\t", round(actual_forecast.iloc[i], 1),
+                  "\t", round(actual_forecast_25.iloc[i], 1))
+
 
 # Load data
 # districts = ['강남구', '강동구', '강북구', '강서구', '관악구', '광진구', '구로구', '금천구', '노원구',
 #              '도봉구', '동대문구', '동작구', '마포구', '서대문구', '서초구', '성동구', '성북구', '송파구',
 #              '양천구', '영등포구', '용산구', '은평구', '종로구', '중구', '중랑구']
-
+#
 # district_of_interest = districts[1]
-
+#
 # df = pd.read_csv('seoul_data_csv/{}_data_filled.csv'.format(district_of_interest))
 # print(district_of_interest)
-
-# ETS = ETS(df)
+#
+# ETS = ETS_model(df)
 # ETS.preset()
-# ETS.train()
-# ETS.predict()
-# ETS.eval()
-# ETS.plot()
-
+# # ETS.train()
+# # ETS.predict()
+# # ETS.eval()
+# # ETS.plot()
+#
+# ETS.actual_predict(term=10)
